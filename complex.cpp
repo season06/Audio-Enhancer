@@ -7,13 +7,13 @@ typedef struct Complex
     Complex(double a, double b) : re(a), im(b) {};
 } complex;
 
-complex* initialize(vector<double> real, vector<double> imag)
+complex *initialize(vector<int16_t> real)
 {
     complex *data = new complex[real.size()];
     for (int i = 0; i < real.size(); i++)
     {
-        data[i].re = real[i];
-        data[i].im = imag[i];
+        data[i].re = (double)real[i];
+        data[i].im = 0;
     }
     return data;
 }

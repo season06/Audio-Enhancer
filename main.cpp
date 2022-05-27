@@ -9,7 +9,7 @@
 
 using namespace std;
 
-void paddingToPowerOfTwo(vector<double> &data)
+void paddingToPowerOfTwo(vector<int16_t> &data)
 {
     unsigned int n = data.size();
 
@@ -47,22 +47,27 @@ void printData(complex data[], uint64_t N)
 int main(int argc, char *argv[])
 {
     const char *file_path = (argc > 0) ? argv[1] : nullptr;
-    vector<double> audio_data;
+    vector<int16_t> audio_data;
 
-    // load .wav into data
-    loadAudioData(file_path, audio_data);
+    // 1. load .wav into data
+    WavFile wav_file;
+    wav_file.readAudioData(file_path, audio_data);
+    // wav_file.writeAudioData(audio_data);
 
-    // padding data
+    return 0;
+    
+
+    // 2. padding data
     paddingToPowerOfTwo(audio_data);
 
-    // fft
+    // 3. fft
     uint64_t N = audio_data.size();
-    complex *data = initialize(audio_data, vector<double>(N, 0));
+    complex *data = initialize(audio_data);
     fft(data, N);
 
-    // filter
-    // ifft
-    // data to wav audio
+    // 4. filter frequency
+    // 5. ifft
+    // 6. data to wav audio
 
     printData(data, N);
 
