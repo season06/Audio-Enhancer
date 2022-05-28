@@ -29,22 +29,13 @@ typedef struct WAV_HEADER
 class WavFile
 {
 public:
-    WavFile() {};
+    WavFile(){};
+    WavFile(const char *file_path): file_path(file_path) {};
     void printHeaderInfo();
-    int readAudioData(const char *file_path, vector<int16_t> &data);
+    int readAudioData(vector<int16_t> &data);
     int writeAudioData(vector<int16_t> &data);
 
 private:
-    int getFileSize(FILE *inFile)
-    {
-        int fileSize = 0;
-        fseek(inFile, 0, SEEK_END);
-
-        fileSize = ftell(inFile);
-        fseek(inFile, 0, SEEK_SET);
-
-        return fileSize;
-    }
     FILE *openWav(const char *file_path)
     {
         string input;
@@ -69,8 +60,8 @@ private:
         return wav_file;
     }
 
+    const char *file_path;
     wavheader wav_header;
-    vector<size_t> byte_arr;
 };
 
 void WavFile::printHeaderInfo()
@@ -93,18 +84,12 @@ void WavFile::printHeaderInfo()
     cout << "Data length                :" << wav_header.SubChunk2Size << endl;
 }
 
-int WavFile::readAudioData(const char *file_path, vector<int16_t> &data)
+int WavFile::readAudioData(vector<int16_t> &data)
 {
-    FILE *wav_file = openWav(file_path);
-    FILE *outfile = fopen("test_r.wav", "wb");  // write test
-    FILE *outfile2 = fopen("test_w.wav", "wb"); // write test
+    FILE *infile = openWav(file_path);
 
     // read the header
-    size_t byte_read = fread(&wav_header, 1, sizeof(wav_header), wav_file);
-    fwrite(&wav_header, 1, sizeof(wav_header), outfile);  // write test
-    fwrite(&wav_header, 1, sizeof(wav_header), outfile2); // write test
-
-    fseek(wav_file, 44, SEEK_SET);  // skip header data
+    size_t byte_read = fread(&wav_header, 1, sizeof(wav_header), infile);
     cout << "Header Read " << byte_read << " bytes." << endl;
     if (byte_read != 44)
     {
@@ -120,44 +105,34 @@ int WavFile::readAudioData(const char *file_path, vector<int16_t> &data)
         const uint16_t buffer_size = wav_header.SubChunk2Size / bytes_per_sample;
 
         int16_t *buffer = new int16_t[buffer_size];
-        int i = 0;
-        while ((byte_read = fread(buffer, bytes_per_sample, buffer_size, wav_file)) > 0)
+        while ((byte_read = fread(buffer, bytes_per_sample, buffer_size, infile)) > 0)
         {
-            data.push_back(*buffer);
-            byte_arr.push_back(byte_read);
-            fwrite(buffer, bytes_per_sample, byte_read, outfile);      // write test
-            fwrite(&(data[i]), bytes_per_sample, byte_read, outfile2); // write test
-            i++;
+            copy(buffer, buffer + byte_read, std::back_inserter(data));
         }
-
         delete[] buffer;
         buffer = nullptr;
     }
-    fclose(wav_file);
+    fclose(infile);
+    cout << "Data Read " << data.size() * 2 << " bytes." << endl;
 
     return 0;
 }
 
 int WavFile::writeAudioData(vector<int16_t> &data)
 {
-    FILE *outfile = fopen("test_output.wav", "wb");
+    FILE *outfile = fopen("output.wav", "wb");
 
     // write the header
     fwrite(&wav_header, 1, sizeof(wav_header), outfile);
-    fseek(outfile, 44, SEEK_SET);  // skip header data
 
     uint16_t bytes_per_sample = wav_header.bitsPerSample / 8;
     const uint16_t buffer_size = wav_header.SubChunk2Size / bytes_per_sample;
 
     // write data
-    int16_t *buffer = new int16_t[buffer_size];
-    for(int i = 0; i < byte_arr.size(); i++)
+    for(int i = 0; i < data.size(); i++)
     {
-        *buffer = data[i];
-        fwrite(buffer, bytes_per_sample, byte_arr[i], outfile);
+        fwrite(&data[i], 1, sizeof(int16_t), outfile);
     }
-    delete[] buffer;
-    buffer = nullptr;
 
     fclose(outfile);
 

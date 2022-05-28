@@ -28,7 +28,7 @@ void paddingToPowerOfTwo(vector<int16_t> &data)
 
 void printData(complex data[], uint64_t N)
 {
-    int start = 50022, end = 50030;
+    int start = 500220, end = 500230;
     for (int i = start; i < end; i++)
         cout << data[i].re << " ";
     cout << "\n";
@@ -50,12 +50,8 @@ int main(int argc, char *argv[])
     vector<int16_t> audio_data;
 
     // 1. load .wav into data
-    WavFile wav_file;
-    wav_file.readAudioData(file_path, audio_data);
-    // wav_file.writeAudioData(audio_data);
-
-    return 0;
-    
+    WavFile wav_file(file_path);
+    wav_file.readAudioData(audio_data);
 
     // 2. padding data
     paddingToPowerOfTwo(audio_data);
@@ -68,8 +64,9 @@ int main(int argc, char *argv[])
     // 4. filter frequency
     // 5. ifft
     // 6. data to wav audio
+    // wav_file.writeAudioData(data);
 
-    printData(data, N);
+    // printData(data, N);
 
     return 0;
 }
