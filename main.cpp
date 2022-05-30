@@ -7,15 +7,19 @@
 #include "complex.cpp"
 #include "FFT.cpp"
 
-using namespace std;
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
-void paddingToPowerOfTwo(vector<int16_t> &data)
+using namespace std;
+namespace py = pybind11;
+
+vector<int16_t> paddingToPowerOfTwo(vector<int16_t> data)
 {
     unsigned int n = data.size();
 
     // if power is 2 then return
     if ((n & (n - 1)) == 0)
-        return;
+        return data;
 
     // get the next number which power is 2
     unsigned int base_2_num = 1;
@@ -24,6 +28,8 @@ void paddingToPowerOfTwo(vector<int16_t> &data)
 
     // padding zero
     data.resize(base_2_num, 0);
+
+    return data;
 }
 
 void printData(complex data[], uint64_t N)
@@ -54,7 +60,7 @@ int main(int argc, char *argv[])
     wav_file.readAudioData(audio_data);
 
     // 2. padding data
-    paddingToPowerOfTwo(audio_data);
+    audio_data = paddingToPowerOfTwo(audio_data);
 
     // 3. fft
     uint64_t N = audio_data.size();
@@ -69,4 +75,26 @@ int main(int argc, char *argv[])
     // printData(data, N);
 
     return 0;
+}
+
+PYBIND11_MODULE(main, a)
+{
+    a.doc() = "audio enhancer";
+    a.def("fft", &fft, py::arg("data"), py::arg("N"), py::arg("inv") = false);
+    a.def("ifft", &ifft);
+    a.def("paddingToPowerOfTwo", &paddingToPowerOfTwo);
+    a.def("initialize", &initialize);
+    a.def("getReals", &getReals);
+    a.def("getImags", &getImags);
+
+    py::class_<Complex>(a, "Complex")
+        .def_readonly("re", &Complex::re)
+        .def_readonly("im", &Complex::im);
+
+    py::class_<WavFile>(a, "WavFile")
+        .def(py::init<>())
+        .def(py::init<const char *>())
+        .def("printHeaderInfo", &WavFile::printHeaderInfo)
+        .def("readAudioData", &WavFile::readAudioData)
+        .def("writeAudioData", &WavFile::writeAudioData);
 }
