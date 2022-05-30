@@ -101,7 +101,7 @@ int WavFile::readAudioData(vector<int16_t> &data)
     if (byte_read > 0)
     {
         uint16_t bytes_per_sample = wav_header.bitsPerSample / 8;      // Number of bytes per sample
-        uint64_t numSamples = wav_header.ChunkSize / bytes_per_sample; // How many samples are in the wav file
+        // uint64_t numSamples = wav_header.ChunkSize / bytes_per_sample; // How many samples are in the wav file
         const uint16_t buffer_size = wav_header.SubChunk2Size / bytes_per_sample;
 
         int16_t *buffer = new int16_t[buffer_size];
@@ -125,11 +125,8 @@ int WavFile::writeAudioData(vector<int16_t> &data)
     // write the header
     fwrite(&wav_header, 1, sizeof(wav_header), outfile);
 
-    uint16_t bytes_per_sample = wav_header.bitsPerSample / 8;
-    const uint16_t buffer_size = wav_header.SubChunk2Size / bytes_per_sample;
-
     // write data
-    for(int i = 0; i < data.size(); i++)
+    for(unsigned int i = 0; i < data.size(); i++)
     {
         fwrite(&data[i], 1, sizeof(int16_t), outfile);
     }

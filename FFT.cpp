@@ -3,7 +3,7 @@
 uint64_t reverseBits(uint64_t n, uint64_t bits)
 {
     uint64_t result = 0;
-    for (int i = 0; i < bits; i++)
+    for (uint64_t i = 0; i < bits; i++)
         result = (result << 1) + (n >> i & 1);
 
     return result;
@@ -22,18 +22,19 @@ void arrayReorder(complex data[], uint64_t N)
     }
 }
 
-void fft(complex data[], uint64_t N, int64_t sign = 1)
+void fft(complex data[], uint64_t N, bool inv = false)
 {
     complex wn, deltawn, t, u;
     uint64_t log2n = (N == 0) ? 0 : log2(N);
+    int64_t sign = inv ? 1 : -1;
 
     arrayReorder(data, N);
 
-    for (uint64_t i = 1; i <= log2n; ++i) // logn 次迴圈
+    for (uint64_t i = 1; i <= log2n; ++i) // logn
     {
         uint64_t m = 1 << i;
         deltawn = complex(cos(2 * PI / m), sign * sin(2 * PI / m));
-        for (uint64_t k = 0; k < N; k += m) // 這個for和下面的for加起來，是n次迴圈
+        for (uint64_t k = 0; k < N; k += m) // this `for` and next `for` add up to O(n)
         {
             wn = complex(1, 0);
             for (uint64_t j = 0; j < m / 2; j++)
@@ -50,7 +51,7 @@ void fft(complex data[], uint64_t N, int64_t sign = 1)
 
 void ifft(complex data[], uint64_t N)
 {
-    fft(data, N, -1);
+    fft(data, N, true);
 
     for (uint64_t i = 0; i < N; ++i)
         data[i].re /= N;
