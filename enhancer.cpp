@@ -32,25 +32,7 @@ vector<int16_t> paddingToPowerOfTwo(vector<int16_t> data)
     return data;
 }
 
-void printData(complex data[], uint64_t N)
-{
-    int start = 500220, end = 500230;
-    for (int i = start; i < end; i++)
-        cout << data[i].re << " ";
-    cout << "\n";
-
-    fft(data, N);
-    for (int i = start; i < end; i++)
-        cout << data[i].re << " ";
-    cout << "\n";
-
-    ifft(data, N);
-    for (int i = start; i < end; i++)
-        cout << data[i].re << " ";
-    cout << "\n";
-}
-
-int main(int argc, char *argv[])
+int enhancer(int argc, char *argv[])
 {
     const char *file_path = (argc > 0) ? argv[1] : nullptr;
     vector<int16_t> audio_data;
@@ -72,12 +54,10 @@ int main(int argc, char *argv[])
     // 6. data to wav audio
     // wav_file.writeAudioData(data);
 
-    // printData(data, N);
-
     return 0;
 }
 
-PYBIND11_MODULE(main, a)
+PYBIND11_MODULE(enhancer, a)
 {
     a.doc() = "audio enhancer";
     a.def("fft", &fft, py::arg("data"), py::arg("N"), py::arg("inv") = false);
