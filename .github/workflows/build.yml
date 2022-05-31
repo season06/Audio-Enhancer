@@ -1,0 +1,36 @@
+name: Audio-Enhancer Test
+
+on:
+  push:
+    branchs: [ "main" ]
+  pull_request: 
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+        matrix:
+          os: [ubuntu-20.04]
+        fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 1
+
+    - name: dependency (ubuntu)
+      run: |
+        sudo apt-get -q update
+        sudo apt-get -qy install \
+            curl build-essential make cmake libc6-dev \
+            python3 python3-pip python3-pytest \
+            python3-numpy python3-matplotlib python3-scipy \
+            jupyter
+        cd /usr/bin ; sudo ln -sf py.test-3 py.test
+
+    - name: test
+      run: |
+        make
+        make test
