@@ -57,3 +57,23 @@ vector<double> getImags(complex *comp, int N)
         imag[i] = comp[i].im;
     return imag;
 }
+
+vector<int16_t> getSignal(complex *comp, int N)
+{
+    vector<int16_t> data(N);
+    for (int i = 0; i < N; i++)
+        data[i] = (int)round(comp[i].re);
+    return data;
+}
+
+void toZero(complex &a)
+{
+    a.re = 0;
+    a.im = 0;
+}
+
+void toDouble(complex &a)
+{
+    a.re *= 2;
+    a.im *= 2;
+}

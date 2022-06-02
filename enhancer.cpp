@@ -7,6 +7,7 @@
 #include "openwav.cpp"
 #include "complex.cpp"
 #include "FFT.cpp"
+#include "scale.cpp"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -94,12 +95,14 @@ int enhancer(int argc, char *argv[])
     fft(data, N);
 
     // 3. adjust frequency
+    scale(data, wav_file, mode, freq);
 
     // 4. ifft
     ifft(data, N);
 
     // 5. data to wav audio
-    // wav_file.writeAudioData(data);
+    vector<int16_t> new_signal = getSignal(data, signal_size);
+    wav_file.writeAudioData(new_signal);
 
     return 0;
 }
