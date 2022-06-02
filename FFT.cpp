@@ -1,5 +1,24 @@
 #define PI acos(-1.0)
 
+vector<int16_t> paddingToPowerOfTwo(vector<int16_t> data)
+{
+    unsigned int n = data.size();
+
+    // if power is 2 then return
+    if ((n & (n - 1)) == 0)
+        return data;
+
+    // get the next number which power is 2
+    unsigned int base_2_num = 1;
+    while (base_2_num < n)
+        base_2_num <<= 1;
+
+    // padding zero
+    data.resize(base_2_num, 0);
+
+    return data;
+}
+
 uint64_t reverseBits(uint64_t n, uint64_t bits)
 {
     uint64_t result = 0;

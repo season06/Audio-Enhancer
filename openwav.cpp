@@ -40,19 +40,15 @@ public:
 private:
     FILE *openWav(const char *file_path)
     {
-        string input;
-        if (file_path == nullptr)
-        {
-            cout << "Input wave file name: ";
-            cin >> input;
-            file_path = input.c_str();
-        }
-
         FILE *wav_file = fopen(file_path, "rb");
         if (wav_file == nullptr)
         {
             fprintf(stderr, "Unable to open wave file: %s\n", file_path);
             exit(1);
+        }
+        else
+        {
+            printf("Open %s successfully.\n", file_path);
         }
 
         return wav_file;

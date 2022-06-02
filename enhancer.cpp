@@ -1,7 +1,8 @@
 #include <iostream>
-#include <string>
 #include <vector>
+#include <string.h>
 #include <math.h>
+#include <fstream>
 
 #include "openwav.cpp"
 #include "complex.cpp"
@@ -13,45 +14,91 @@
 using namespace std;
 namespace py = pybind11;
 
-vector<int16_t> paddingToPowerOfTwo(vector<int16_t> data)
+void printHelp()
 {
-    unsigned int n = data.size();
+    ifstream file("help.txt");
+    string str;
+    while (getline(file, str))
+        cout << str << endl;
+    file.close();
 
-    // if power is 2 then return
-    if ((n & (n - 1)) == 0)
-        return data;
+    exit(0);
+}
 
-    // get the next number which power is 2
-    unsigned int base_2_num = 1;
-    while (base_2_num < n)
-        base_2_num <<= 1;
+const char *checkMode(const char *mode)
+{
+    if (strcmp(mode, "gain") != 0 && strcmp(mode, "debuff") != 0)
+    {
+        fprintf(stderr, "Please select `gain` or `debuff` as the mode.\n");
+        exit(1);
+    }
+    return mode;
+}
 
-    // padding zero
-    data.resize(base_2_num, 0);
-
-    return data;
+void manageArguments(int argc, char *argv[], const char *&file_path, const char *&mode, int &freq)
+{
+    for (int i = 1; i < argc; i += 2)
+    {
+        string arg = argv[i];
+        if (arg == "--help" || arg == "-h")
+            printHelp();
+        else if (arg == "--file" || arg == "-F")
+            file_path = argv[i + 1];
+        else if (arg == "--mode" || arg == "-m")
+            mode = checkMode(argv[i + 1]);
+        else if (arg == "--freq" || arg == "-f")
+            freq = atoi(argv[i + 1]);
+    }
+    if (file_path == nullptr)
+    {
+        string input;
+        cout << "Input wave file name: ";
+        cin >> input;
+        file_path = input.c_str();
+    }
+    if (mode == nullptr)
+    {
+        string input;
+        cout << "Input mode: (gain, debuff)";
+        cin >> input;
+        mode = input.c_str();
+    }
+    if (freq == 0)
+    {
+        int input;
+        cout << "Input frequency: ";
+        cin >> input;
+        freq = input;
+    }
 }
 
 int enhancer(int argc, char *argv[])
 {
-    const char *file_path = (argc > 0) ? argv[1] : nullptr;
-    vector<int16_t> audio_data;
+    const char *file_path = nullptr;
+    const char *mode = nullptr;
+    int freq = 0;
+
+    // manage arguments
+    manageArguments(argc, argv, file_path, mode, freq);
 
     // 1. load .wav into data
+    vector<int16_t> signal;
     WavFile wav_file(file_path);
-    wav_file.readAudioData(audio_data);
+    wav_file.readAudioData(signal);
+    int signal_size = signal.size();
 
-    // 2. padding data
-    audio_data = paddingToPowerOfTwo(audio_data);
-
-    // 3. fft
-    uint64_t N = audio_data.size();
-    complex *data = initialize(audio_data);
+    // 2. fft
+    signal = paddingToPowerOfTwo(signal);
+    uint64_t N = signal.size();
+    complex *data = initialize(signal);
     fft(data, N);
 
-    // 4. filter frequency
-    // 5. ifft
-    // 6. data to wav audio
+    // 3. adjust frequency
+
+    // 4. ifft
+    ifft(data, N);
+
+    // 5. data to wav audio
     // wav_file.writeAudioData(data);
 
     return 0;
