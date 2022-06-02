@@ -18,9 +18,9 @@ typedef struct WAV_HEADER
     uint16_t AudioFormat;   // Audio format: 1=PCM, 6=mulaw, 7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
     uint16_t NumOfChan;     // Number of channels: 1=Mono, 2=Sterio
     uint32_t SamplesRate;   // Sampling Frequency (Hz)
-    uint32_t bytesRate;     // bytes per second
-    uint16_t blockAlign;    // 2=16-bit mono, 4=16-bit stereo
-    uint16_t bitsPerSample; // Number of bits per sample
+    uint32_t BytesPerSecond;// bytes per second
+    uint16_t BlockAlign;    // 2=16-bit mono, 4=16-bit stereo
+    uint16_t BitDepth;      // Number of bits per sample
     /* "data" sub-chunk */
     uint8_t DataTag[4];     // "data" string
     uint32_t SubChunk2Size; // Sampled data length
@@ -32,8 +32,10 @@ public:
     WavFile(){};
     WavFile(const char *file_path): file_path(file_path) {};
     void printHeaderInfo();
-    int readAudioData(vector<int16_t> &data);
-    int writeAudioData(vector<int16_t> &data);
+    void readAudioData(vector<int16_t> &data);
+    void writeAudioData(vector<int16_t> &data);
+    int getSampleRate();
+    int getFileSize();
 
 private:
     FILE *openWav(const char *file_path)
@@ -44,10 +46,6 @@ private:
             cout << "Input wave file name: ";
             cin >> input;
             file_path = input.c_str();
-        }
-        else
-        {
-            cout << "Input wave file name: " << file_path << endl;
         }
 
         FILE *wav_file = fopen(file_path, "rb");
@@ -76,15 +74,32 @@ void WavFile::printHeaderInfo()
     cout << "Audio Format               :" << wav_header.AudioFormat << endl;
     cout << "Number of channels         :" << wav_header.NumOfChan << endl;
     cout << "Sampling Rate              :" << wav_header.SamplesRate << endl;
-    cout << "Number of bytes per second :" << wav_header.bytesRate << endl;
-    cout << "Block align                :" << wav_header.blockAlign << endl;
-    cout << "Number of bits used        :" << wav_header.bitsPerSample << endl;
+    cout << "Number of bytes per second :" << wav_header.BytesPerSecond << endl;
+    cout << "Block align                :" << wav_header.BlockAlign << endl;
+    cout << "Number of bits used        :" << wav_header.BitDepth << endl;
 
     cout << "Data string                :" << wav_header.DataTag[0] << wav_header.DataTag[1] << wav_header.DataTag[2] << wav_header.DataTag[3] << endl;
     cout << "Data length                :" << wav_header.SubChunk2Size << endl;
 }
 
-int WavFile::readAudioData(vector<int16_t> &data)
+int WavFile::getSampleRate()
+{
+    return wav_header.BytesPerSecond;
+}
+
+int WavFile::getFileSize()
+{
+    FILE *infile = openWav(file_path);
+
+    int fileSize = 0;
+    fseek(infile, 0, SEEK_END);
+    fileSize = ftell(infile);
+    fseek(infile, 0, SEEK_SET);
+
+    return fileSize;
+}
+
+void WavFile::readAudioData(vector<int16_t> &data)
 {
     FILE *infile = openWav(file_path);
 
@@ -100,7 +115,7 @@ int WavFile::readAudioData(vector<int16_t> &data)
     // read data
     if (byte_read > 0)
     {
-        uint16_t bytes_per_sample = wav_header.bitsPerSample / 8;      // Number of bytes per sample
+        uint16_t bytes_per_sample = wav_header.BitDepth / 8;      // Number of bytes per sample
         // uint64_t numSamples = wav_header.ChunkSize / bytes_per_sample; // How many samples are in the wav file
         const uint16_t buffer_size = wav_header.SubChunk2Size / bytes_per_sample;
 
@@ -114,15 +129,16 @@ int WavFile::readAudioData(vector<int16_t> &data)
     }
     fclose(infile);
     cout << "Data Read " << data.size() * 2 << " bytes." << endl;
-
-    return 0;
 }
 
-int WavFile::writeAudioData(vector<int16_t> &data)
+void WavFile::writeAudioData(vector<int16_t> &data)
 {
     FILE *outfile = fopen("output.wav", "wb");
 
     // write the header
+    wav_header.NumOfChan = 1;
+    wav_header.BytesPerSecond = wav_header.NumOfChan * wav_header.SamplesRate * (wav_header.BitDepth / 8);
+    wav_header.BlockAlign = wav_header.NumOfChan * (wav_header.BitDepth / 8);
     fwrite(&wav_header, 1, sizeof(wav_header), outfile);
 
     // write data
@@ -132,8 +148,6 @@ int WavFile::writeAudioData(vector<int16_t> &data)
     }
 
     fclose(outfile);
-
-    return 0;
 }
 
 /*
