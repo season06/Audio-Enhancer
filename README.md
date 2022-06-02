@@ -1,10 +1,6 @@
 # Audio Enhancer
 
-
-Audio Enhancer is an online **Parametric Equalizer** which can make audio more prominent.
-
-- GitHub repository: [Audio Enhancer](https://github.com/season06/Audio-Enhancer)
-
+Audio Enhancer is a command-line tool that can scale specific frequencies in your audio.
 
 ## Problem to Solve
 
@@ -35,43 +31,20 @@ Most equalizers are hardware, this program develops an online equalizer and uses
 ## Prospective Users
 
 - Audio maker  
-    Creators can use Audio Enhancer to improve audio quality online.
-- Users who use Real-time Meetings  
-    If the system can read the audio in real time and quickly judge and filter the noise, it can help audience hear more clearly.
-
-
+    Creators can use Audio Enhancer to scale the amplitude of a specific frequency.
 ## System Architecture
 <img src="./images/system_architecture.png" alt="system_architecture"/>
 
 ## API Description
-`equalize(file, mode='allpass', freq=0, gain=0, Q=0)`
+`enhancer -F audio.wav -m debuff -f 1000`
 
 - `file`: An audio file, allow type: `.wav`
-- `mode`: Define the shape of the processing curve.
-    - `lowpass`
-    - `highpass`
-    - `lowshelf`
-    - `highshelf`
-    - `bandpass`
-    - `notch`
-    - `allpass`
-- `freq`: A frequency position need to be adjust. (unit: Hz)
-- `gain`: Amplification or attenuation of a certain range of frequencies. (unit: Db)
-- `Q`: Define the steepness or width of each filter.
+- `mode`: Scale the specific frequency.
+    - `gain`:   Double the amplitude of the frequency.
+    - `debuff`: Remove the amplitude of the frequency.
+- `freq`: A frequency position need to be scale. (unit: Hz)
 
-The following table describe the meaning of the parameters in each mode:
-
-| `mode`      | description       | `freq`                             | `gain` | `Q` |
-| :---------- | :---------------- | :--------------------------------- | :----- | :------- |
-| `lowpass`   | Low-pass filter   | The cut-off frequency              | unused | Drop-off steepness at the cut-off frequency |
-| `highpass`  | High-pass filter  | The cut-off frequency              | unused | Drop-off steepness at the cut-off frequency |
-| `lowshelf`  | Low-shelf filter  | The upper limit of the frequencies | The amplification or attenuation level | unused |
-| `highshelf` | High-shelf filter | The lower limit of the frequencies | The amplification or attenuation level | unused |
-| `bandpass`  | Band-pass filter  | Center of the frequency band       | unused | The width of the frequency band |
-| `notch`     | Notch filter      | Center of the frequency band       | unused | The width of the frequency band |
-| `allpass`   | All-pass filter   | unused | unused | unused |
-
-
+User can use `enhancer --help` to read document.
 ## Engineering Infrastructure
 
 - Automatic build system: `make`
@@ -101,3 +74,4 @@ Planning phase (6 weeks including 2/21, 2/28, 3/7, 3/14, 3/21, 3/28):
 [Fast Fourier Transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform)  
 [What is the Fourier Transform? A visual introduction.](https://www.youtube.com/watch?v=spUNpyF58BY&ab_channel=3Blue1Brown)  
 [WAV](https://zh.wikipedia.org/zh-tw/WAV)  
+[Online Tone Generator](https://www.szynalski.com/tone-generator/)

@@ -4,7 +4,7 @@ Example: enhancer -F audio.wav -m debuff -f 1000
 
 Arguments:
     -F, --file  Audio file path, only supports `.wav`.
-    -m, --mode  There are three modes to adjust the frequency of your choice.
+    -m, --mode  There are three modes to scale the frequency of your choice.
                 - gain    Double the amplitude of the frequency.
                 - debuff  Remove the amplitude of the frequency.
-    -f, --freq  The specific frequency needs to be increased or decreased.
+    -f, --freq  A specific frequency needs to be scale.
