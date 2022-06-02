@@ -5,7 +5,7 @@ import enhancer
 import pytest
 import timeit
 import numpy as np
-from scipy.fftpack import fft
+from scipy.fftpack import fft, ifft
 
 
 def test_padding():
@@ -48,10 +48,14 @@ def test_ifft():
 
         enhancer.fft(comp, n)
         enhancer.ifft(comp, n)
-        real = enhancer.getReals(comp, n)
+        c_ifft = enhancer.getReals(comp, n)
+
+        py_fft = fft(data)
+        py_ifft = ifft(py_fft)
 
         for i in range(0, n):
-            assert abs(data[i] - real[i]) <= 1e-3
+            assert abs(data[i] - c_ifft[i]) <= 1e-3
+            assert abs(c_ifft[i] - py_ifft[i]) <= 1e-3
 
 
 def test_performance():
