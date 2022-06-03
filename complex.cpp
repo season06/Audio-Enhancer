@@ -10,7 +10,7 @@ typedef struct Complex
 complex *initialize(vector<int16_t> real)
 {
     complex *data = new complex[real.size()];
-    for (unsigned int i = 0; i < real.size(); i++)
+    for (size_t i = 0; i < real.size(); i++)
     {
         data[i].re = (double)real[i];
         data[i].im = 0;

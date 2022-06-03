@@ -176,7 +176,7 @@ void WavFile::writeAudioData(vector<int16_t> &data)
     fwrite(&chunk, 1, sizeof(chunk), outfile);
 
     // write data
-    for(unsigned int i = 0; i < data.size(); i++)
+    for (size_t i = 0; i < data.size(); i++)
     {
         fwrite(&data[i], 1, sizeof(int16_t), outfile);
     }
