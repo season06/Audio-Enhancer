@@ -26,14 +26,23 @@ void printHelp()
     exit(0);
 }
 
+const char *checFile(const char *file)
+{
+    size_t len = strlen(file);
+    if (file[len - 4] == '.' || file[len - 3] == 'w' || file[len - 2] == 'a' || file[len - 1] == 'v')
+        return file;
+
+    fprintf(stderr, "Please input `.wav` file.\n");
+    exit(1);
+}
+
 const char *checkMode(const char *mode)
 {
-    if (strcmp(mode, "gain") != 0 && strcmp(mode, "debuff") != 0)
-    {
-        fprintf(stderr, "Please select `gain` or `debuff` as the mode.\n");
-        exit(1);
-    }
-    return mode;
+    if (strcmp(mode, "gain") == 0 || strcmp(mode, "debuff") == 0)
+        return mode;
+
+    fprintf(stderr, "Please select `gain` or `debuff` as the mode.\n");
+    exit(1);
 }
 
 void manageArguments(int argc, char *argv[], const char *&file_path, const char *&mode, int &freq)
@@ -44,7 +53,7 @@ void manageArguments(int argc, char *argv[], const char *&file_path, const char 
         if (arg == "--help" || arg == "-h")
             printHelp();
         else if (arg == "--file" || arg == "-F")
-            file_path = argv[i + 1];
+            file_path = checFile(argv[i + 1]);
         else if (arg == "--mode" || arg == "-m")
             mode = checkMode(argv[i + 1]);
         else if (arg == "--freq" || arg == "-f")
@@ -55,14 +64,14 @@ void manageArguments(int argc, char *argv[], const char *&file_path, const char 
         string input;
         cout << "Input wave file name: ";
         cin >> input;
-        file_path = input.c_str();
+        file_path = checFile(input.c_str());
     }
     if (mode == nullptr)
     {
         string input;
-        cout << "Input mode: (gain, debuff)";
+        cout << "Input mode (gain, debuff): ";
         cin >> input;
-        mode = input.c_str();
+        mode = checkMode(input.c_str());
     }
     if (freq == 0)
     {
@@ -94,8 +103,8 @@ int enhancer(int argc, char *argv[])
     complex *data = initialize(signal);
     fft(data, N);
 
-    // 3. adjust frequency
-    scale(data, wav_file, mode, freq);
+    // 3. scale frequency
+    scale(data, wav_file, N, mode, freq);
 
     // 4. ifft
     ifft(data, N);
@@ -103,7 +112,7 @@ int enhancer(int argc, char *argv[])
     // 5. data to wav audio
     vector<int16_t> new_signal = getSignal(data, signal_size);
     wav_file.writeAudioData(new_signal);
-
+    
     return 0;
 }
 
