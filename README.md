@@ -77,7 +77,7 @@ Test audio includes 500Hz and 2228Hz and the test goal is to eliminate 500Hz.
     <img src="./images/result_origin_time_domain.png" alt="result_origin_time_domain"/>
 - Second, convert the signal from the time domain to the spectrum domain using FFT. You can see that there are two upright lines at 500Hz and 2228Hz. 
     <img src="./images/result_fft_freq_domain.png" alt="result_fft_freq_domain"/>
-- Then, I scale the frequency, setting the value of 500Hz to 0;
+- Then, I scale the frequency, setting the value of 500Hz to 0.
     <img src="./images/result_scale_freq_domain.png" alt="result_scale_freq_domain"/>
 - Finally, using inverse-FFT to bring signal back to the time domain, the 500Hz waveform is gone. 
 <img src="./images/result_ifft_time_domain.png" alt="result_ifft_time_domain"/>
@@ -87,5 +87,5 @@ Test audio includes 500Hz and 2228Hz and the test goal is to eliminate 500Hz.
 [Fast Fourier Transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform)  
 [What is the Fourier Transform? A visual introduction.](https://www.youtube.com/watch?v=spUNpyF58BY&ab_channel=3Blue1Brown)  
 [WAV](https://zh.wikipedia.org/zh-tw/WAV)  
-[Scipy/wavfile.py](https://github.com/scipy/scipy/blob/main/scipy/io/wavfile.py)
-[Online Tone Generator](https://www.szynalski.com/tone-generator/)-
+[Scipy/wavfile.py](https://github.com/scipy/scipy/blob/main/scipy/io/wavfile.py)  
+[Online Tone Generator](https://www.szynalski.com/tone-generator/)
