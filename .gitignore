@@ -31,4 +31,8 @@
 *.out
 *.app
 
+# Python
+__pycache__
+.pytest_cache
+
 .vscode
