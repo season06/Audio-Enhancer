@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.getcwd())
 
-import enhancer
+import _enhancer
 import pytest
 import timeit
 import numpy as np
@@ -14,7 +14,7 @@ def test_padding():
 
     for n, ans in zip(n_size, ans_size):
         data = np.random.randint(10, size=n, dtype=np.int16).tolist()
-        padding_data = enhancer.paddingToPowerOfTwo(data)
+        padding_data = _enhancer.paddingToPowerOfTwo(data)
 
         assert len(padding_data) == ans
 
@@ -25,11 +25,11 @@ def test_fft():
 
     for n in n_size:
         data = np.random.randint(max, size=n, dtype=np.int16).tolist()
-        comp = enhancer.initialize(data)
+        comp = _enhancer.initialize(data)
 
-        enhancer.fft(comp, n)
-        real = enhancer.getReals(comp, n)
-        imag = enhancer.getImags(comp, n)
+        _enhancer.fft(comp, n)
+        real = _enhancer.getReals(comp, n)
+        imag = _enhancer.getImags(comp, n)
 
         py_fft = fft(data)
 
@@ -44,11 +44,11 @@ def test_ifft():
 
     for n in n_size:
         data = np.random.randint(max, size=n, dtype=np.int16).tolist()
-        comp = enhancer.initialize(data)
+        comp = _enhancer.initialize(data)
 
-        enhancer.fft(comp, n)
-        enhancer.ifft(comp, n)
-        c_ifft = enhancer.getReals(comp, n)
+        _enhancer.fft(comp, n)
+        _enhancer.ifft(comp, n)
+        c_ifft = _enhancer.getReals(comp, n)
 
         py_fft = fft(data)
         py_ifft = ifft(py_fft)
@@ -67,13 +67,13 @@ def test_performance():
 
         for n in n_size:
             data = np.random.randint(max, size=n, dtype=np.int16).tolist()
-            comp = enhancer.initialize(data)
-            self_init = dict(enhancer=enhancer, comp=comp, n=n)
+            comp = _enhancer.initialize(data)
+            self_init = dict(_enhancer=_enhancer, comp=comp, n=n)
             py_init = dict(fft=fft, data=data)
 
             f.write(f"\nData size: {str(n)}\n")
 
-            self_fft_time = timeit.timeit("enhancer.fft(comp, n)", number=1, globals=self_init)
+            self_fft_time = timeit.timeit("_enhancer.fft(comp, n)", number=1, globals=self_init)
             f.write(f"Self FFT time : {str(self_fft_time)}\n")
 
             py_fft_time = timeit.timeit("fft(data)", number=1, globals=py_init)
